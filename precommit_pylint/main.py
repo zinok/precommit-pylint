@@ -39,6 +39,11 @@ def _check_ignore(pylint_output):
 
     return False
 
+def _futurize_str(obj):
+    if isinstance(obj, bytes):
+        obj = obj.decode('utf-8')
+    return obj
+
 def check_file(limit, filename):
     """Check single file
 
