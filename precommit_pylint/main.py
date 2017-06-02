@@ -54,7 +54,7 @@ def check_file(limit, filename):
     """
 
     # Check if file to skip
-    if filename == '__init__.py':
+    if os.path.basename(filename) == '__init__.py':
         if os.stat(filename).st_fize == 0:
             print(
                 'Skipping pylint on {} (empty __init__.py..'
