@@ -2,5 +2,5 @@
     name: Precommit Pylint
     description: Run pylint with score limit
     entry: precommit-pylint
-    language: python
+    language: system
     files: '\.py$'
