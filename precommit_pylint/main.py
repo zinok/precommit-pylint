@@ -93,7 +93,7 @@ def check_file(limit, filename, output=False):
         status,
         ignored and '\tIGNORED' or ''))
 
-    if output:
+    if output and score < 10:
         print("="*80)
         print(out)
         print("="*80)
