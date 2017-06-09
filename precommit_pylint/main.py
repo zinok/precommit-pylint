@@ -5,13 +5,14 @@ from __future__ import unicode_literals
 import argparse
 import os
 import re
+import sys
 import decimal
 import subprocess
 
 _SCORE_REGEXP = re.compile(
     r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
 
-_IGNORE_REGEXT = re.compile(
+_IGNORE_REGEXP = re.compile(
     r'Ignoring entire file \(file\-ignored\)'
 )
 
@@ -33,7 +34,7 @@ def _check_ignore(pylint_output):
     returns False otherwise
     """
     for line in pylint_output.splitlines():
-        match = re.search(_IGNORE_REGEXT, _futurize_str(line))
+        match = re.search(_IGNORE_REGEXP, _futurize_str(line))
         if match:
             return True
 
@@ -62,7 +63,7 @@ def check_file(limit, filename):
             return True
 
     # Start pylint
-    print('Running pylint on {}..\t'.format(filename))
+    sys.stdout.write('Running pylint on {}..\t'.format(filename))
 
     try:
         command = ['pylint', filename]
@@ -103,6 +104,12 @@ def main(argv=None):
         '--limit', type=float, default=10,
         help=(
             'Score limit for pylint, defaults to `%(default)s`'
+        ),
+    )
+    parser.add_argument(
+        '--show-output', type=bool, default=False,
+        help=(
+            'Show pylint output, defaults to `%(default)s`'
         ),
     )
     args = parser.parse_args(argv)
