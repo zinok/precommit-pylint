@@ -45,13 +45,15 @@ def _futurize_str(obj):
         obj = obj.decode('utf-8')
     return obj
 
-def check_file(limit, filename):
+def check_file(limit, filename, output=False):
     """Check single file
 
     :type limit: float
     :param limit: Minimum score to pass the commit
     :type filename: str
     :param filename: Path to the file to check
+    :type output: bool
+    :param output: Show pylint output
     """
 
     # Check if file to skip
@@ -91,6 +93,12 @@ def check_file(limit, filename):
         status,
         ignored and '\tIGNORED' or ''))
 
+    if output:
+        print "="*80
+        print out
+        print "="*80
+        print
+
     # If failed
     if status == 'FAILED':
         return False
@@ -107,7 +115,7 @@ def main(argv=None):
         ),
     )
     parser.add_argument(
-        '--show-output', type=bool, default=False,
+        '--output', type=bool, default=False,
         help=(
             'Show pylint output, defaults to `%(default)s`'
         ),
@@ -116,7 +124,7 @@ def main(argv=None):
 
     # check files
     for filename in args.filenames:
-        if not check_file(args.limit, filename):
+        if not check_file(args.limit, filename, args.output):
             return 1
 
     return 0
