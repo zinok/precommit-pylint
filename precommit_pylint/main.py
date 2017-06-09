@@ -94,10 +94,10 @@ def check_file(limit, filename, output=False):
         ignored and '\tIGNORED' or ''))
 
     if output:
-        print "="*80
-        print out
-        print "="*80
-        print
+        print("="*80)
+        print(out)
+        print("="*80)
+        print("")
 
     # If failed
     if status == 'FAILED':
