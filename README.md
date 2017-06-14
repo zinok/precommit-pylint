@@ -4,15 +4,15 @@ precommit-pylint
 Hook for pylint with configurable score limit.
 
 
-## Installation
+## Notice
 
-`pip install precommit-pylint`
-
+The hook is shipped not as a python package as for python packages pre-commit runs them in 
+virtualenv, which does not really work for pylint well.
 
 ## Console scripts
 
 ```
-precommit-pylint --help
+precommit-pylint.py --help
 usage: precommit-pylint [-h] [--limit LIMIT] [filenames [filenames ...]]
 
 positional arguments:
