@@ -1,6 +1,6 @@
 -   id: precommit-pylint
     name: Precommit Pylint
     description: Run pylint with score limit
-    entry: precommit-pylint.sh
+    entry: python -m precommit_pylint.main
     language: script
     files: '\.py$'
