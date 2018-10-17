@@ -20,15 +20,13 @@ _IGNORE_REGEXP = re.compile(
 
 def _parse_score(pylint_output):
     """Parse the score out of pylint's output as a float
-
-    If the score is not found, return 0.0.
-
+    If the score is not found, return 10.0
     """
     for line in pylint_output.splitlines():
         match = re.match(_SCORE_REGEXP, _futurize_str(line))
         if match:
             return float(match.group(1))
-    return 0.0
+    return 10.0
 
 def _check_ignore(pylint_output):
     """Check the python file whether ignored
