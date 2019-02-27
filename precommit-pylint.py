@@ -115,7 +115,7 @@ def main(argv=None):
         ),
     )
     parser.add_argument(
-        '--output', type=bool, default=False,
+        '--output', action='store_true',
         help=(
             'Show pylint output, defaults to `%(default)s`'
         ),
