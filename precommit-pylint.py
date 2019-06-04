@@ -5,10 +5,9 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import decimal
 import os
 import re
-import sys
-import decimal
 import subprocess
 
 _SCORE_REGEXP = re.compile(
@@ -17,6 +16,7 @@ _SCORE_REGEXP = re.compile(
 _IGNORE_REGEXP = re.compile(
     r'Ignoring entire file \(file\-ignored\)'
 )
+
 
 def _parse_score(pylint_output):
     """Parse the score out of pylint's output as a float
@@ -27,6 +27,7 @@ def _parse_score(pylint_output):
         if match:
             return float(match.group(1))
     return 10.0
+
 
 def _check_ignore(pylint_output):
     """Check the python file whether ignored
@@ -40,10 +41,12 @@ def _check_ignore(pylint_output):
 
     return False
 
+
 def _futurize_str(obj):
     if isinstance(obj, bytes):
         obj = obj.decode('utf-8')
     return obj
+
 
 def check_file(limit, filename, output=False):
     """Check single file
@@ -65,7 +68,7 @@ def check_file(limit, filename, output=False):
             return True
 
     # Start pylint
-    sys.stdout.write('Running pylint on {}..\t'.format(filename))
+    print('Running pylint on {}..\t'.format(filename))
 
     try:
         command = ['pylint', filename]
@@ -94,9 +97,9 @@ def check_file(limit, filename, output=False):
         ignored and '\tIGNORED' or ''))
 
     if output and score < 10:
-        print("="*80)
-        print(out)
-        print("="*80)
+        print("=" * 80)
+        print(_futurize_str(out))
+        print("=" * 80)
         print("")
 
     # If failed
@@ -104,6 +107,7 @@ def check_file(limit, filename, output=False):
         return False
 
     return True
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
