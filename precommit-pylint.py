@@ -68,7 +68,7 @@ def check_file(limit, filename, output=False):
             return True
 
     # Start pylint
-    print('Running pylint on {}..\t'.format(filename))
+    print('Running pylint on {}..'.format(filename), end="\t")
 
     try:
         command = ['pylint', filename]
