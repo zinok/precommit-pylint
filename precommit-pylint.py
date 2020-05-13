@@ -1,32 +1,19 @@
-#!/usr/bin/env python
-
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+#!/usr/bin/env python3
 
 import argparse
-import decimal
+import contextlib
+import io
 import os
 import re
-import subprocess
+
+from pylint.lint import Run as pylint_run
 
 _SCORE_REGEXP = re.compile(
-    r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
+    r'^Your code has been rated at (-?[0-9.]+)/10')
 
 _IGNORE_REGEXP = re.compile(
-    r'Ignoring entire file \(file\-ignored\)'
+    r'Ignoring entire file \(file-ignored\)'
 )
-
-
-def _parse_score(pylint_output):
-    """Parse the score out of pylint's output as a float
-    If the score is not found, return 10.0
-    """
-    for line in pylint_output.splitlines():
-        match = re.match(_SCORE_REGEXP, _futurize_str(line))
-        if match:
-            return float(match.group(1))
-    return 10.0
 
 
 def _check_ignore(pylint_output):
@@ -35,17 +22,11 @@ def _check_ignore(pylint_output):
     returns False otherwise
     """
     for line in pylint_output.splitlines():
-        match = re.search(_IGNORE_REGEXP, _futurize_str(line))
+        match = re.search(_IGNORE_REGEXP, line)
         if match:
             return True
 
     return False
-
-
-def _futurize_str(obj):
-    if isinstance(obj, bytes):
-        obj = obj.decode('utf-8')
-    return obj
 
 
 def check_file(limit, filename, output=False):
@@ -60,53 +41,34 @@ def check_file(limit, filename, output=False):
     """
 
     # Check if file to skip
-    if os.path.basename(filename) == '__init__.py':
-        if os.stat(filename).st_size == 0:
-            print(
-                'Skipping pylint on {} (empty __init__.py..'
-                '\tSKIPPED'.format(filename))
-            return True
+    if os.path.basename(filename) == '__init__.py' and os.stat(filename).st_size == 0:
+        print(f'Skipping pylint on {filename} (empty __init__.py..\tSKIPPED')
+        return True
 
     # Start pylint
-    print('Running pylint on {}..'.format(filename), end="\t")
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        with contextlib.redirect_stderr(buffer):
+            linter = pylint_run([filename], do_exit=False).linter
 
-    try:
-        command = ['pylint', filename]
-        proc = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-
-        out, _ = proc.communicate()
-    except OSError:
-        print("\nAn error occurred. Is pylint installed?")
-        return False
+    out = buffer.getvalue()
 
     # Verify the score
-    score = _parse_score(out)
+    score = linter.stats.get('global_note', 0.0)
     ignored = _check_ignore(out)
-    if ignored or score >= float(limit):
-        status = 'PASSED'
-    else:
-        status = 'FAILED'
+    file_passed = ignored or score >= float(limit)
 
     # Add some output
-    print('{:.2}/10.00\t{}{}'.format(
-        decimal.Decimal(score),
-        status,
-        ignored and '\tIGNORED' or ''))
+    print('Running pylint on {}.. {:.2f}/10.00\t{}{}'.format(
+        filename, score,
+        'PASSED' if file_passed else 'FAILED',
+        '\tIGNORED' if ignored else ''
+    ))
 
     if output and score < 10:
-        print("=" * 80)
-        print(_futurize_str(out))
-        print("=" * 80)
-        print("")
+        print("{0}\n{1}{0}\n".format("=" * 80, out))
 
-    # If failed
-    if status == 'FAILED':
-        return False
-
-    return True
+    return file_passed
 
 
 def main(argv=None):
