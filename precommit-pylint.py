@@ -50,8 +50,11 @@ def check_file(limit, filename, output=False):
 
     out = buffer.getvalue()
 
+    # pylint don't score files without statements
+    score_missing = 0.0 if linter.stats.get('statement') else 10.0
+
     # Verify the score
-    score = linter.stats.get('global_note', 0.0)
+    score = linter.stats.get('global_note', score_missing)
     ignored = _check_ignore(out)
     file_passed = ignored or score >= float(limit)
 
