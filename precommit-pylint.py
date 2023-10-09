@@ -46,7 +46,7 @@ def check_file(limit, filename, output=False):
     buffer = io.StringIO()
     with contextlib.redirect_stdout(buffer):
         with contextlib.redirect_stderr(buffer):
-            linter = pylint_run([filename], do_exit=False).linter
+            linter = pylint_run([filename], exit=False).linter
 
     out = buffer.getvalue()
 
